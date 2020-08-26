@@ -8,18 +8,18 @@ import com.example.synrgy_orm_room.db.ItemDatabase
 import com.example.synrgy_orm_room.R
 import kotlinx.android.synthetic.main.activity_edit.*
 import kotlinx.android.synthetic.main.activity_edit.btnSaveEdit
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import androidx.core.widget.addTextChangedListener
 
-class EditActivity : AppCompatActivity() {
-    private lateinit var db: ItemDatabase
+class EditActivity : AppCompatActivity(), EditActivityPresenter.Listener {
+
     private lateinit var item : Item
+    private lateinit var presenter: EditActivityPresenter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
+
         ItemDatabase.getInstance(this)?.let {
-            db = it
+            presenter = EditActivityPresenter(it, this)
         }
         intent.getParcelableExtra<Item>("item")?.let {
             item = it
@@ -28,28 +28,25 @@ class EditActivity : AppCompatActivity() {
         etNameEdit.setText(item.name)
         etQuantityEdit.setText(item.quantity.toString())
 
-        etNameEdit.addTextChangedListener {
-            Toast.makeText(this@EditActivity,"EditText Berubah", Toast.LENGTH_LONG).show()
-        }
-
         btnSaveEdit.setOnClickListener{
             item.apply {
                 name = etNameEdit.text.toString()
                 quantity = etQuantityEdit.text.toString().toInt()
             }
+            presenter.editItem(item)
+        }
+    }
 
-            GlobalScope.launch {
-                val rowUpdated = db.itemDao().updateItem(item)
+    override fun showEditSuccess() {
+        runOnUiThread {
+            Toast.makeText(this@EditActivity,"Data Telah Terupdate", Toast.LENGTH_LONG).show()
+            finish()
+        }
+    }
 
-                runOnUiThread{
-                    if (rowUpdated>0){
-                        Toast.makeText(this@EditActivity, "Data sukses diupdate", Toast.LENGTH_LONG).show()
-                        this@EditActivity.finish()
-                    } else {
-                        Toast.makeText(this@EditActivity, "Data gagal diupdate", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
+    override fun showEditFailed() {
+        runOnUiThread {
+            Toast.makeText(this@EditActivity,"Data Gagal diupdate", Toast.LENGTH_LONG).show()
         }
     }
 }
