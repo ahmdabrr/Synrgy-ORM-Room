@@ -3,6 +3,7 @@ package com.example.synrgy_orm_room.main
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.synrgy_orm_room.R
@@ -11,6 +12,8 @@ import com.example.synrgy_orm_room.db.Item
 import com.example.synrgy_orm_room.db.ItemDatabase
 import com.example.synrgy_orm_room.edit.EditActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import org.json.JSONArray
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity(), MainActivityPresenter.Listener {
 
@@ -27,6 +30,51 @@ class MainActivity : AppCompatActivity(), MainActivityPresenter.Listener {
         ItemDatabase.getInstance(this)?.let {
             presenter = MainActivityPresenter(it, this)
         }
+
+        //JSON
+        val objectJson = JSONObject()
+
+        val jsonArrayListStudent = JSONArray()
+        jsonArrayListStudent.put(
+            JSONObject()
+                .put("name", "Johan")
+                .put("status", "Single")
+                .put("age", 23)
+        )
+        jsonArrayListStudent.put(
+            JSONObject()
+                .put("name", "Andi")
+                .put("status", "Single")
+                .put("age", 20)
+        )
+
+        objectJson.put("class", "Android")
+        objectJson.put("score", 90)
+        objectJson.put("allMale", true)
+        objectJson.put("listStudent", jsonArrayListStudent)
+
+        Log.d("BNR", objectJson.toString())
+
+        val jsonObjectByString = JSONObject("""
+            {
+               "class":"Android",
+               "score":90,
+               "allMale":true,
+               "listStudent":[
+                  {
+                     "name":"Andi",
+                     "status":"Single Parent",
+                     "age":45
+                  },
+                  {
+                     "name":"Johan",
+                     "status":"Single",
+                     "age":17
+                  }
+               ]
+            }
+        """.trimIndent())
+
     }
 
     override fun onResume() {
