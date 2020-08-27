@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.synrgy_orm_room.R
 import com.example.synrgy_orm_room.add.AddActivity
 import com.example.synrgy_orm_room.db.Item
+import com.example.synrgy_orm_room.db.ItemDatabase
 import com.example.synrgy_orm_room.edit.EditActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -20,9 +21,11 @@ class MainActivity : AppCompatActivity(), MainActivityPresenter.Listener {
         setContentView(R.layout.activity_main)
 
         fabAdd.setOnClickListener{
-            val intentGoToActivityAdd = Intent(this, AddActivity::class.java)
+            presenter.goToAddActivity()
+        }
 
-            startActivity(intentGoToActivityAdd)
+        ItemDatabase.getInstance(this)?.let {
+            presenter = MainActivityPresenter(it, this)
         }
     }
 
@@ -52,6 +55,7 @@ class MainActivity : AppCompatActivity(), MainActivityPresenter.Listener {
 
     override fun showDeletedSuccess(item: Item) {
         Toast.makeText(this, "Data ${item.name} Sukses Dihapus", Toast.LENGTH_LONG).show()
+        presenter.fetchData()
     }
 
     override fun showDeletedFailed(item: Item) {
